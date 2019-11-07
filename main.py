@@ -28,26 +28,27 @@ if os.path.isfile(folderName+paramName):
     fid.close()
     
     # unpack the input list
-    caliBoxHeight, caliBoxLength, cropVidHeight, cropVidLength, axisInterval, newVidFrameRate, frameStart, frameEnd = input_list
+    calibBoxHeight, calibBoxWidth, cropVidHeight, cropVidWidth, axisInterval, cm2px, newVidFrameRate, frameStart, frameEnd = input_list
 else:
     print('Input parameters have not been saved previously, so specify them.')
     # specify the size of the calibration box
-    caliBoxHeight = 9.6             # unit: cm
-    caliBoxLength = 15.2            # unit: cm
+    calibBoxHeight = 9.6                    # unit: cm
+    calibBoxWidth = 15.2                    # unit: cm
 
     # specify the size of the cropped video
-    cropVidHeight = 6               # unit: cm
-    cropVidLength = 2*cropVidHeight # unit: cm
-    axisInterval = int(cropVidHeight/3) # unit: cm
+    cropVidHeight = 6                       # unit: cm
+    cropVidWidth = 2*cropVidHeight          # unit: cm
+    axisInterval = int(cropVidHeight/3)     # unit: cm
+    cm2px = 50                              # number of pixels per cm in video
 
     # specify the control parameters for the output video
-    newVidFrameRate = 12            # unit: FPS
-    frameStart = 1                  # first frame, set to 1 if not sure
-    frameEnd = frameStart+60        # final frame, set to 1 if not sure
+    newVidFrameRate = 12                    # unit: FPS
+    frameStart = 120                        # first frame, set to 1 if not sure
+    frameEnd = frameStart+60                # final frame, set to 1 if not sure
 
     # save the input parameters
-    input_list = [caliBoxHeight, caliBoxLength,
-                  cropVidHeight, cropVidLength, axisInterval,
+    input_list = [calibBoxHeight, calibBoxWidth,
+                  cropVidHeight, cropVidWidth, axisInterval, cm2px,
                   newVidFrameRate, frameStart, frameEnd]
     fid = open(folderName+paramName, 'wb')
     pickle.dump(input_list, fid)
@@ -56,12 +57,14 @@ else:
 ## Capture the video and create the video object for output
 # capture the video
 capVid = cv2.VideoCapture(folderName+fileName)
-capVidWidth = capVid.get(cv2.CAP_PROP_FRAME_WIDTH)
-capVidHeight = capVid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+#capVidWidth = capVid.get(cv2.CAP_PROP_FRAME_WIDTH)
+#capVidHeight = capVid.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 # define the codec and create video writer object
+newVidWidth = int(cm2px*cropVidWidth)
+newvidHeight = int(cm2px*cropVidHeight)
 fourcc = cv2.VideoWriter.fourcc(*'DIVX')
-newVid = cv2.VideoWriter(folderName+newVidName, fourcc, newVidFrameRate, (int(capVidWidth), int(capVidHeight)))
+newVid = cv2.VideoWriter(folderName+newVidName, fourcc, newVidFrameRate, (newVidWidth, newvidHeight))
 
 # find whether the video is captured coorrectly
 if not capVid.isOpened():
@@ -91,15 +94,22 @@ for frameID in range(frameStart, frameEnd):
             else:
                 cornerCoords = []           # a list to store the corners
                 calibration_points(frameGray, cornerCoords)
-                print(cornerCoords)
-         
+                # store the calibration points
+                fid = open(folderName+calibName, 'wb')
+                pickle.dump(cornerCoords, fid)
+                fid.close()
+ 
         # calibrate the frame regarding camera distortions
-        #frameCalib = perspective_transform(frameGray, cornerCoords)
+        frameCalib = perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px)
 
-        
-
+        # display the processed image
+        cv2.namedWindow('frameCalib', cv2.WINDOW_NORMAL)
+        cv2.imshow('frameCalib', frameCalib)
+        cv2.resizeWindow('frameCalib', int(calibBoxWidth*50), int(calibBoxHeight*50))
+      
         # write the processed frame - write BGR frames only!!!!!!!!
-        newVid.write(frame)
+        frameCalib = cv2.cvtColor(frameCalib, cv2.COLOR_GRAY2BGR)
+        newVid.write(frameCalib)
 
         # wait key input to slow down the video and end the job if wanted
         if cv2.waitKey(1) & 0xFF == 27:     # increase the wait time in milliseconds to slow down the play

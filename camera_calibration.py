@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 
 def calibration_points(frameGray, cornerCoords):
@@ -27,7 +28,24 @@ def calibration_points(frameGray, cornerCoords):
     cv2.destroyAllWindows()
 
 
-def perspective_transform():
+def perspective_transform(frameGray, cornerCoords, calibBoxwidth, calibBoxHeight, cm2px):
     """Calibrate the distorted frame due to the perspective effects."""
 
-    print('hello world')
+    # convert list of calibration points to a numpy array
+    pts_src = np.array(cornerCoords, dtype=np.float32)
+
+    # define the destination points according to the dimension of calibration box
+    borderWidth = 2*cm2px                     # include one cm of space outside the calibration box
+    col_left = cm2px
+    col_right = cm2px*(calibBoxwidth+1)
+    row_top = cm2px
+    row_bottom = cm2px*(calibBoxHeight+1)
+    pts_dst = np.float32([[col_left, row_top], [col_right, row_top], [col_left, row_bottom], [col_right, row_bottom]])
+
+    # calculate the transformation matrix and correct the perspective distortion
+    newWidth = int(cm2px*(calibBoxwidth+2))    # increase coeff to increase the size of result
+    newHeight = int(cm2px*(calibBoxHeight+2))
+    transformM = cv2.getPerspectiveTransform(pts_src, pts_dst)
+    frameCalib = cv2.warpPerspective(frameGray, transformM, (newWidth, newHeight))
+
+    return frameCalib
