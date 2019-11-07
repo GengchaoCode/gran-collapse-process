@@ -36,7 +36,7 @@ else:
     calibBoxWidth = 15.2                    # unit: cm
 
     # specify the size of the cropped video
-    cropVidHeight = 6                       # unit: cm
+    cropVidHeight = 3                       # unit: cm
     cropVidWidth = 2*cropVidHeight          # unit: cm
     axisInterval = int(cropVidHeight/3)     # unit: cm
     cm2px = 50                              # number of pixels per cm in video
@@ -102,10 +102,13 @@ for frameID in range(frameStart, frameEnd):
         # calibrate the frame regarding camera distortions
         frameCalib = perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px)
 
+        # crop the image to the region of interest
+        frameCrop = crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px)
+
         # display the processed image
-        cv2.namedWindow('frameCalib', cv2.WINDOW_NORMAL)
-        cv2.imshow('frameCalib', frameCalib)
-        cv2.resizeWindow('frameCalib', int(calibBoxWidth*50), int(calibBoxHeight*50))
+        cv2.namedWindow('frameCrop', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('frameCrop', int(cm2px*cropVidWidth), int(cm2px*cropVidHeight))
+        cv2.imshow('frameCrop', frameCrop)
       
         # write the processed frame - write BGR frames only!!!!!!!!
         frameCalib = cv2.cvtColor(frameCalib, cv2.COLOR_GRAY2BGR)

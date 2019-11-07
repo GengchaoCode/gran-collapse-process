@@ -28,24 +28,40 @@ def calibration_points(frameGray, cornerCoords):
     cv2.destroyAllWindows()
 
 
-def perspective_transform(frameGray, cornerCoords, calibBoxwidth, calibBoxHeight, cm2px):
+def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px):
     """Calibrate the distorted frame due to the perspective effects."""
 
     # convert list of calibration points to a numpy array
     pts_src = np.array(cornerCoords, dtype=np.float32)
 
     # define the destination points according to the dimension of calibration box
-    borderWidth = 2*cm2px                     # include one cm of space outside the calibration box
     col_left = cm2px
-    col_right = cm2px*(calibBoxwidth+1)
+    col_right = cm2px*(calibBoxWidth+1)
     row_top = cm2px
     row_bottom = cm2px*(calibBoxHeight+1)
     pts_dst = np.float32([[col_left, row_top], [col_right, row_top], [col_left, row_bottom], [col_right, row_bottom]])
 
     # calculate the transformation matrix and correct the perspective distortion
-    newWidth = int(cm2px*(calibBoxwidth+2))    # increase coeff to increase the size of result
-    newHeight = int(cm2px*(calibBoxHeight+2))
+    calibWidth = int(cm2px*(calibBoxWidth+2))       # width of the calibrated frame
+    calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
     transformM = cv2.getPerspectiveTransform(pts_src, pts_dst)
-    frameCalib = cv2.warpPerspective(frameGray, transformM, (newWidth, newHeight))
+    frameCalib = cv2.warpPerspective(frameGray, transformM, (calibWidth, calibHeight))
 
     return frameCalib
+
+
+def crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px):
+    """Crop the frame to the region of interest"""
+
+    # determine the bound of the cropped image
+    col_left = int(cm2px)
+    col_right = col_left+int(cm2px*cropVidWidth)
+
+    calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
+    row_top = calibHeight-int(cm2px)-int(cm2px*cropVidHeight)
+    row_bottom = row_top+int(cm2px*cropVidHeight)
+
+    # crop the image using numpy slicing
+    frameCrop = frameCalib[row_top:row_bottom, col_left:col_right]
+
+    return frameCrop
