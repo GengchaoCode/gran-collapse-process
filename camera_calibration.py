@@ -46,7 +46,7 @@ def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight
     calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
     transformM = cv2.getPerspectiveTransform(pts_src, pts_dst)
     frameCalib = cv2.warpPerspective(frameGray, transformM, (calibWidth, calibHeight))
-
+    
     return frameCalib
 
 

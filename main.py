@@ -15,10 +15,10 @@ from camera_calibration import *    # import the class to correct the perspectiv
 ## Specify the parameters for video processing and free-surface detection
 # parameters related to file naming and location
 folderName = 'D:\\Experimental_Results\\2019_HKU_PRFluids_columnSizeEffects\\T1b_AR0.50W18_GB1.44mm_Li3.0cm_Hi1.50cm_SP80Cw_20190325\\'   # folder where the video exists
-fileName = 'IMG_1694.MOV'           # video name
-paramName = 'input_parameters.dat'  # name for the saved input parameters
-calibName = 'calib_corners.dat'     # name foor the saved calibration points (corners of a rectangle)
-newVidName = 'video_calibrated.avi' # name of the output video
+fileName = 'IMG_1694.MOV'                   # video name
+paramName = 'input_parameters.dat'          # name for the saved input parameters
+calibName = 'calib_corners.dat'             # name foor the saved calibration points (corners of a rectangle)
+newVidName = 'video_calibrated.avi'         # name of the output video
 
 # parameters related to video processing
 if os.path.isfile(folderName+paramName):
@@ -39,7 +39,7 @@ else:
     cropVidHeight = 3                       # unit: cm
     cropVidWidth = 2*cropVidHeight          # unit: cm
     axisInterval = int(cropVidHeight/3)     # unit: cm
-    cm2px = 50                              # number of pixels per cm in video
+    cm2px = 100                             # number of pixels per cm in video
 
     # specify the control parameters for the output video
     newVidFrameRate = 12                    # unit: FPS
@@ -57,14 +57,12 @@ else:
 ## Capture the video and create the video object for output
 # capture the video
 capVid = cv2.VideoCapture(folderName+fileName)
-#capVidWidth = capVid.get(cv2.CAP_PROP_FRAME_WIDTH)
-#capVidHeight = capVid.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 # define the codec and create video writer object
 newVidWidth = int(cm2px*cropVidWidth)
-newvidHeight = int(cm2px*cropVidHeight)
+newVidHeight = int(cm2px*cropVidHeight)
 fourcc = cv2.VideoWriter.fourcc(*'DIVX')
-newVid = cv2.VideoWriter(folderName+newVidName, fourcc, newVidFrameRate, (newVidWidth, newvidHeight))
+newVid = cv2.VideoWriter(folderName+newVidName, fourcc, newVidFrameRate, (newVidWidth, newVidHeight), 0)
 
 # find whether the video is captured coorrectly
 if not capVid.isOpened():
@@ -101,18 +99,20 @@ for frameID in range(frameStart, frameEnd):
  
         # calibrate the frame regarding camera distortions
         frameCalib = perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px)
+        print(frameCalib.shape[:2])
 
         # crop the image to the region of interest
         frameCrop = crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px)
 
+        # convert the image to black and white - thresholding
+        
+
         # display the processed image
-        cv2.namedWindow('frameCrop', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('frameCrop', int(cm2px*cropVidWidth), int(cm2px*cropVidHeight))
         cv2.imshow('frameCrop', frameCrop)
       
         # write the processed frame - write BGR frames only!!!!!!!!
-        frameCalib = cv2.cvtColor(frameCalib, cv2.COLOR_GRAY2BGR)
-        newVid.write(frameCalib)
+        frameCalib = cv2.cvtColor(frameCrop, cv2.COLOR_GRAY2BGR)
+        newVid.write(frameCrop)
 
         # wait key input to slow down the video and end the job if wanted
         if cv2.waitKey(1) & 0xFF == 27:     # increase the wait time in milliseconds to slow down the play
