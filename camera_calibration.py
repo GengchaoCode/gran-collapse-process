@@ -65,3 +65,34 @@ def crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px):
     frameCrop = frameCalib[row_top:row_bottom, col_left:col_right]
 
     return frameCrop
+
+
+def add_info(img, frameID, frameStart, orgVidFrameRate, newVidFrameRate):
+    """Add text information to the processed video"""
+
+    # information to show
+    time = (frameID-frameStart)/newVidFrameRate
+    info1 = 'Time: '+'{:.3f}'.format(time)+' s'
+    info2 = 'Current frame ID: '+str(frameID)
+    info3 = 'Original video frame rate: '+str(orgVidFrameRate)+' fps'
+    info4 = 'Output video frame rate: '+str(newVidFrameRate)+' fps'
+    info = [info1, info2, info3, info4]
+
+    # size of the image
+    height, width = img.shape           # image is store as numpy arrays
+    linespace = 0.05*height
+
+    # basic parameters for drawing texts
+    font = cv2.FONT_HERSHEY_COMPLEX     # font type
+    fs = 0.7                            # font scale
+    fc = (255, 255, 0)                  # font color = yellow
+    thick = 1                           # thickness of the strokes
+    lt = cv2.FILLED                     # line type
+    
+    # loop 4 times to write four lines of information
+    orgX = int(0.63*width)
+    for i in range(4):
+        orgY = int(0.05*height+i*linespace)
+        frameOut = cv2.putText(img, info[i], (orgX, orgY), font, fs, fc, thick, lt)
+
+    return frameOut

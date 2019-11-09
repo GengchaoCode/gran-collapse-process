@@ -7,6 +7,7 @@ Author: YANG Gengchao (The University of Hong Kong)
 import os
 import pickle
 import cv2
+from matplotlib import pyplot as plt
 os.system('cls')                    # clear the screen
 
 # user-defined functioons
@@ -39,7 +40,7 @@ else:
     cropVidHeight = 3                       # unit: cm
     cropVidWidth = 2*cropVidHeight          # unit: cm
     axisInterval = int(cropVidHeight/3)     # unit: cm
-    cm2px = 100                             # number of pixels per cm in video
+    cm2px = 200                             # number of pixels per cm in video
 
     # specify the control parameters for the output video
     newVidFrameRate = 12                    # unit: FPS
@@ -57,6 +58,7 @@ else:
 ## Capture the video and create the video object for output
 # capture the video
 capVid = cv2.VideoCapture(folderName+fileName)
+orgVidFrameRate = capVid.get(cv2.CAP_PROP_FPS)
 
 # define the codec and create video writer object
 newVidWidth = int(cm2px*cropVidWidth)
@@ -86,10 +88,12 @@ for frameID in range(frameStart, frameEnd):
         if frameID == frameStart:
             if os.path.isfile(folderName+calibName):
                 # load the calibration points
+                print('The calibration points have been selected previously, so import them.')
                 fid = open(folderName+calibName, 'rb')
                 cornerCoords = pickle.load(fid)
                 fid.close()
             else:
+                print('Select the calibration points to correct the perspective error.')
                 cornerCoords = []           # a list to store the corners
                 calibration_points(frameGray, cornerCoords)
                 # store the calibration points
@@ -99,20 +103,17 @@ for frameID in range(frameStart, frameEnd):
  
         # calibrate the frame regarding camera distortions
         frameCalib = perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px)
-        print(frameCalib.shape[:2])
 
         # crop the image to the region of interest
         frameCrop = crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px)
 
-        # convert the image to black and white - thresholding
-        
+        # put text on videos to show the basic information
+        frameOut = add_info(frameCrop, frameID, frameStart, orgVidFrameRate, newVidFrameRate)
 
-        # display the processed image
-        cv2.imshow('frameCrop', frameCrop)
-      
         # write the processed frame - write BGR frames only!!!!!!!!
-        frameCalib = cv2.cvtColor(frameCrop, cv2.COLOR_GRAY2BGR)
-        newVid.write(frameCrop)
+        frameCalib = cv2.cvtColor(frameOut, cv2.COLOR_GRAY2BGR)
+        cv2.imshow('frame', frameCalib)
+        newVid.write(frameOut)
 
         # wait key input to slow down the video and end the job if wanted
         if cv2.waitKey(1) & 0xFF == 27:     # increase the wait time in milliseconds to slow down the play
