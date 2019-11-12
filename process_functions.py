@@ -1,3 +1,9 @@
+'''
+Functions required for image and video processes
+
+Author: Yang Gengchao (The University of Hong Kong)
+'''
+
 import cv2
 import numpy as np
 
@@ -7,7 +13,7 @@ def calibration_points(frameGray, cornerCoords):
     # mouse callback function
     def select_points(event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
-            cv2.circle(frameGray, (x,y), 10, (0,0,255), -1)
+            #cv2.circle(frameGray, (x,y), 10, (0,0,255), -1)
             cornerCoords.append((x,y))      # mutable object can be changed in functions!!!
 
     # create a window and bind it to the callback function
@@ -19,7 +25,7 @@ def calibration_points(frameGray, cornerCoords):
     for i in range(0,4):
         print('Press any key to log the {} calibration point'.format(info[i]))
         cv2.imshow('frame', frameGray)
-        cv2.resizeWindow('frame', 1280, 720) # shrink the window do show the whole frame
+        cv2.resizeWindow('frame', 1920, 1080) # shrink the window do show the whole frame
 
         # hold the frame for key input
         cv2.waitKey(0) & 0xFF
@@ -27,12 +33,36 @@ def calibration_points(frameGray, cornerCoords):
     # close the current window
     cv2.destroyAllWindows()
 
+def sort_corners(cornerCoords):
+    """Sort the calibration points for perspective transform"""
+
+    # first sort according to the x-coordinates (columns)
+    cornerCoords = sorted(cornerCoords)
+
+    # assign the left columns
+    if cornerCoords[0][1]<cornerCoords[1][1]:
+        topLeftCorner = cornerCoords[0]
+        bottomLeftCorner = cornerCoords[1]
+    else:
+        topLeftCorner = cornerCoords[1]
+        bottomLeftCorner = cornerCoords[0]
+
+    # assign the right columns
+    if cornerCoords[2][1]<cornerCoords[3][1]:
+        topRightCorner = cornerCoords[2]
+        bottomRightCorner = cornerCoords[3]
+    else:
+        topRightCorner = cornerCoords[3]
+        bottomRightCorner = cornerCoords[2]
+
+    return [topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner]
+
 
 def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px):
     """Calibrate the distorted frame due to the perspective effects."""
 
     # convert list of calibration points to a numpy array
-    pts_src = np.array(cornerCoords, dtype=np.float32)
+    pts_src = np.array(sort_corners(cornerCoords), dtype=np.float32)
 
     # define the destination points according to the dimension of calibration box
     col_left = cm2px
@@ -71,9 +101,9 @@ def add_info(img, frameID, frameStart, orgVidFrameRate, newVidFrameRate):
     """Add text information to the processed video"""
 
     # information to show
-    time = (frameID-frameStart)/newVidFrameRate
+    time = (frameID-frameStart)/orgVidFrameRate
     info1 = 'Time: '+'{:.3f}'.format(time)+' s'
-    info2 = 'Current frame ID: '+str(frameID)
+    info2 = 'Current frame ID: '+str(frameID-frameStart+1)
     info3 = 'Original video frame rate: '+str(orgVidFrameRate)+' fps'
     info4 = 'Output video frame rate: '+str(newVidFrameRate)+' fps'
     info = [info1, info2, info3, info4]
