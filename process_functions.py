@@ -15,6 +15,7 @@ def calibration_points(frameGray, cornerCoords):
         if event == cv2.EVENT_LBUTTONDOWN:
             #cv2.circle(frameGray, (x,y), 10, (0,0,255), -1)
             cornerCoords.append((x,y))      # mutable object can be changed in functions!!!
+            cv2.destroyAllWindows()         # close the window by left click
 
     # create a window and bind it to the callback function
     cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
@@ -23,7 +24,7 @@ def calibration_points(frameGray, cornerCoords):
     # display the image and select the points
     info = ['first', 'second', 'third', 'forth']
     for i in range(0,4):
-        print('Press any key to log the {} calibration point'.format(info[i]))
+        print('Select the {} calibration point'.format(info[i]))
         cv2.imshow('frame', frameGray)
         cv2.resizeWindow('frame', 1920, 1080) # shrink the window do show the whole frame
 
