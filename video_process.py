@@ -45,7 +45,7 @@ for frameID in range(frameStart, frameEnd):
         if frameID == frameStart:
             if os.path.isfile(folderName+calibName):
                 # load the calibration points
-                print('The calibration points have been selected previously, so import them.')
+                print('Calibration points have been selected previously, so import them.')
                 fid = open(folderName+calibName, 'rb')
                 cornerCoords = pickle.load(fid)
                 fid.close()
@@ -77,6 +77,10 @@ for frameID in range(frameStart, frameEnd):
             break
     else:
         break                   # end of the video
+
+# save the last frame as the final deposit
+print('Saving the final deposit...')
+cv2.imwrite(folderName+depositFigName, frameOut)
 
 # release all video objects if job is finished
 capVid.release()                    # release the raw video after processing

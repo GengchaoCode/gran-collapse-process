@@ -32,25 +32,29 @@ if os.path.isfile(folderName+runoutName):
 else:
     print('Runout data have not been saved previously. So select them.')
 
+    # create a mouse callback function
+    def pick_front(event, x, y, flag, param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            runout.append(x)
+            cv2.destroyAllWindows()         # close the window after left click
+
     # Cycle through all the frames and pick the front position
     for frameID in np.arange(vidFrameTotal):
         ret, frame = newVid.read()
         
         if ret == True:
-            if frameID%df == 0:
-                # create a mouse callback function
-                def pick_front(event, x, y, flag, param):
-                    if event == cv2.EVENT_LBUTTONDOWN:
-                        runout.append(x)
-                        cv2.destroyAllWindows()         # close the window after left click
-                
+            if frameID%df == 0:              
                 # create a window and bind it to the callback function
                 cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
                 cv2.setMouseCallback('frame', pick_front)
+                cv2.resizeWindow('frame', (newVidWidth, newVidHeight))
 
                 # display the image and select the front
                 cv2.imshow('frame', frame)
-                cv2.waitKey(0) & 0xFF                   # hold the frame for key or click input
+
+                # wait key input to slow down the video and end the job if wanted
+                if cv2.waitKey(0) & 0xFF == 27:     # increase the wait time in milliseconds to slow down the play
+                    break
         
     # dump the runout data
     fid = open(folderName+runoutName, 'wb')
@@ -63,6 +67,7 @@ newVid.release()
 # conver pixcels to centi-meters
 runout = np.array(runout)
 runout = runout/cm2px
+print('******Initial runout distance: '+str(runout[0])+' cm')
 print('******Final runout distance: '+str(runout[-1])+' cm')
 
 ## Plot the normalized runout distance against the time

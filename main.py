@@ -19,6 +19,8 @@ calibName = 'calib_corners.dat'             # name foor the saved calibration po
 newVidName = 'video_calibrated.avi'         # name of the output video
 runoutName = 'runout.dat'                   # name for the runout data
 heightName = 'height.dat'                   # name for the height data
+depositFigName = 'final_deposit.png'        # name for the final deposit image
+depositName = 'deposit_profile.dat'         # name for the final deposit profile data
 
 # parameters related to video processing
 if os.path.isfile(folderName+paramName):
@@ -28,7 +30,8 @@ if os.path.isfile(folderName+paramName):
     fid.close()
     
     # unpack the input list
-    calibBoxHeight, calibBoxWidth, cropVidHeight, cropVidWidth, axisInterval, cm2px, newVidFrameRate, frameStart, vidFrameTotal, frameEnd = input_list
+    calibBoxHeight, calibBoxWidth, cropVidHeight, cropVidWidth, axisInterval,\
+         cm2px, newVidFrameRate, frameStart, vidFrameTotal, frameEnd = input_list
 else:
     print('Input parameters have not been saved previously, so specify them.')
     # specify the size of the calibration box
@@ -64,3 +67,6 @@ exec(open('runout_detection.py').read())
 
 ## Extract the height evolution during granular collapses
 exec(open('height_detection.py').read())
+
+## Extract the heights in the middle of the final deposit
+exec(open('middle_heights.py').read())
