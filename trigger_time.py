@@ -10,6 +10,8 @@ import os
 import pickle
 from matplotlib import pyplot as plt
 
+print('Determine the triggering time according to time evolution of runout distance.')
+
 ## Calculate the time evolution of front velocity
 vel = np.gradient(Ltilde, dt)
 

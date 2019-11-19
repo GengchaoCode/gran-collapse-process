@@ -10,6 +10,8 @@ import os
 import pickle
 from matplotlib import pyplot as plt
 
+print('Extract the heights of the final deposit at 1/3, 1/2 and 2/3 of the final runout distance.')
+
 ## Import the final deposit
 finalDeposit = cv2.imread(folderName+depositFigName, 0)   # read in the grey scale image
 

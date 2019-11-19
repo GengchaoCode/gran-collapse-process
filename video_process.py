@@ -12,6 +12,8 @@ import cv2
 # user-defined functioons
 from process_functions import *    # import the class to correct the perspectives
 
+print('Image and video processing of the experimental data from granular collapses.')
+
 ## Capture the video and create the video object for output
 # capture the video
 capVid = cv2.VideoCapture(folderName+fileName)

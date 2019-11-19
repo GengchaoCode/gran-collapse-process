@@ -10,6 +10,8 @@ import os
 import pickle
 from matplotlib import pyplot as plt
 
+print('Manually pick the front position and save them in a list of runout distance.')
+
 ## Capture the video and define the data acquisition frequency and initialize the runout list
 # create a video capture object to access files containing video data
 newVid = cv2.VideoCapture(folderName+newVidName)

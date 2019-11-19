@@ -73,3 +73,6 @@ exec(open('middle_heights.py').read())
 
 ## Find the triggering time
 exec(open('trigger_time.py').read())
+
+## Find the time period for the propogation stage
+exec(open('run_time.py').read())
