@@ -14,25 +14,26 @@ def calibration_points(frameGray, cornerCoords):
     def select_points(event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
             #cv2.circle(frameGray, (x,y), 10, (0,0,255), -1)
-            cornerCoords.append((x,y))      # mutable object can be changed in functions!!!
-            cv2.destroyAllWindows()         # close the window by left click
-
-    # create a window and bind it to the callback function
-    cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-    cv2.setMouseCallback('frame', select_points)
+            cornerCoords.append((x,y))          # mutable object can be changed in functions!!!
+            cv2.destroyAllWindows()             # close the window by left click
 
     # display the image and select the points
     info = ['first', 'second', 'third', 'forth']
-    for i in range(0,4):
+    for i in range(4):
         print('Select the {} calibration point'.format(info[i]))
+
+        # create a window and bind it to the callback function
+        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+        cv2.setMouseCallback('frame', select_points)
+        cv2.resizeWindow('frame', 1920, 1080)   # shrink the window do show the whole frame
+
+        # display the image and select the calibration points
         cv2.imshow('frame', frameGray)
-        cv2.resizeWindow('frame', 1920, 1080) # shrink the window do show the whole frame
 
         # hold the frame for key input
-        cv2.waitKey(0) & 0xFF
+        if cv2.waitKey(0) & 0xFF == 27:         # increase the wait time in milliseconds to slow down the play
+            break
     
-    # close the current window
-    cv2.destroyAllWindows()
 
 def sort_corners(cornerCoords):
     """Sort the calibration points for perspective transform"""

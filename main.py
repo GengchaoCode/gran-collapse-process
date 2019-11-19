@@ -9,8 +9,8 @@ import pickle
 os.system('cls')                            # clear the screen
 
 ## Which file to process
-folderName = 'C:\\Users\\gengc\Desktop\\2019_HKU_PRFluids_columnSizeEffects\\T1b_AR0.50W18_GB1.44mm_Li3.0cm_Hi1.50cm_SP80Cw_20190325\\'   # folder where the video exists
-fileName = 'IMG_1694.MOV'                   # video name
+folderName = 'C:\\Users\\gengc\Desktop\\2019_HKU_PRFluids_columnSizeEffects\\T1a_AR0.50W18_GB1.44mm_Li3.0cm_Hi1.50cm_SP80Cw_20190225_too_much_disturbance_by_gate_removal\\'   # folder where the video exists
+fileName = 'IMG_1623.MOV'                   # video name
 
 ## Import and calibrate the video and then save it
 # specify the parameters for video processing
@@ -46,7 +46,7 @@ else:
 
     # specify the control parameters for the output video
     newVidFrameRate = 12                    # unit: FPS
-    frameStart = 166                        # first frame, set to 1 if not sure
+    frameStart = 206                        # first frame, set to 1 if not sure
     vidFrameTotal = 60                      # total frame counts for the calibrate video
     frameEnd = frameStart+vidFrameTotal     # final frame, set to 1 if not sure
 
