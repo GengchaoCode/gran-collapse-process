@@ -70,3 +70,6 @@ exec(open('height_detection.py').read())
 
 ## Extract the heights in the middle of the final deposit
 exec(open('middle_heights.py').read())
+
+## Find the triggering time
+exec(open('trigger_time.py').read())

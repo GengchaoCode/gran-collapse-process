@@ -72,8 +72,8 @@ print('******Final runout distance: '+str(runout[-1])+' cm')
 
 ## Plot the normalized runout distance against the time
 # calculate the normalized runout distance
-L_tilde = (runout-runout[0])/runout[0]
-plt.plot(t, L_tilde)
+Ltilde = (runout-runout[0])/runout[0]
+plt.plot(t, Ltilde)
 plt.xlabel('$t$ (s)')
 plt.ylabel('($L-L_i)/L_i$')
 plt.show()

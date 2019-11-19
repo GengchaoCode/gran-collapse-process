@@ -72,8 +72,8 @@ print('******Final residual height: '+str(height[-1])+' cm')
 
 ## Plot the normalized height against the time
 # calculate the normalized height
-H_tilde = (height)/runout[0]
-plt.plot(t, H_tilde)
+Htilde = (height)/runout[0]
+plt.plot(t, Htilde)
 plt.xlabel('$t$ (s)')
 plt.ylabel('$H/L_i$')
 plt.show()
