@@ -66,20 +66,22 @@ def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight
     # convert list of calibration points to a numpy array
     pts_src = np.array(sort_corners(cornerCoords), dtype=np.float32)
 
-    # define the destination points according to the dimension of calibration box
-    col_left = cm2px
-    col_right = cm2px*(calibBoxWidth+1)
-    row_top = cm2px
-    row_bottom = cm2px*(calibBoxHeight+1)
-    pts_dst = np.float32([[col_left, row_top], [col_right, row_top], [col_left, row_bottom], [col_right, row_bottom]])
-
-    # calculate the transformation matrix and correct the perspective distortion
-    if cropVidHeight < calibBoxHeight:                    # if the cropped video is within the calibration box
+    # define the size of the transformed frame
+    if cropVidHeight < calibBoxHeight:                  # if the cropped video is within the calibration box
         calibWidth = int(cm2px*(calibBoxWidth+2))       # width of the calibrated frame
         calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
     else:                                               # if the cropped video is outside the calibration box
         calibWidth = int(cm2px*(cropVidWidth+2))
         calibHeight = int(cm2px*(cropVidHeight+2))
+
+    # define the destination points according to the dimension of calibration box
+    col_left = cm2px
+    col_right = cm2px*(calibBoxWidth+1)
+    row_top = calibHeight-cm2px*(calibBoxHeight+1)
+    row_bottom = calibHeight-cm2px
+    pts_dst = np.float32([[col_left, row_top], [col_right, row_top], [col_left, row_bottom], [col_right, row_bottom]])
+
+    # calculate the transformation matrix and correct the perspective distortion
     transformM = cv2.getPerspectiveTransform(pts_src, pts_dst)
     frameCalib = cv2.warpPerspective(frameGray, transformM, (calibWidth, calibHeight))
     
