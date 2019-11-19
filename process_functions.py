@@ -60,7 +60,7 @@ def sort_corners(cornerCoords):
     return [topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner]
 
 
-def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px):
+def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px, cropVidWidth, cropVidHeight):
     """Calibrate the distorted frame due to the perspective effects."""
 
     # convert list of calibration points to a numpy array
@@ -74,8 +74,12 @@ def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight
     pts_dst = np.float32([[col_left, row_top], [col_right, row_top], [col_left, row_bottom], [col_right, row_bottom]])
 
     # calculate the transformation matrix and correct the perspective distortion
-    calibWidth = int(cm2px*(calibBoxWidth+2))       # width of the calibrated frame
-    calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
+    if cropVidHeight < calibBoxHeight:                    # if the cropped video is within the calibration box
+        calibWidth = int(cm2px*(calibBoxWidth+2))       # width of the calibrated frame
+        calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
+    else:                                               # if the cropped video is outside the calibration box
+        calibWidth = int(cm2px*(cropVidWidth+2))
+        calibHeight = int(cm2px*(cropVidHeight+2))
     transformM = cv2.getPerspectiveTransform(pts_src, pts_dst)
     frameCalib = cv2.warpPerspective(frameGray, transformM, (calibWidth, calibHeight))
     
@@ -89,7 +93,11 @@ def crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px):
     col_left = int(cm2px)
     col_right = col_left+int(cm2px*cropVidWidth)
 
-    calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
+    if cropVidHeight < calibBoxHeight:
+        calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
+    else:
+        calibHeight = int(cm2px*(cropVidHeight+2))
+
     row_top = calibHeight-int(cm2px)-int(cm2px*cropVidHeight)
     row_bottom = row_top+int(cm2px*cropVidHeight)
 

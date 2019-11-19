@@ -61,7 +61,7 @@ for frameID in range(frameStart, frameEnd):
                 fid.close()
  
         # calibrate the frame regarding camera distortions
-        frameCalib = perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px)
+        frameCalib = perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px, cropVidWidth, cropVidHeight)
 
         # crop the image to the region of interest
         frameCrop = crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px)
