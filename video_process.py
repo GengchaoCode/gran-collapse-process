@@ -64,7 +64,7 @@ for frameID in range(frameStart, frameEnd):
         frameCalib = perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight, cm2px, cropVidWidth, cropVidHeight)
 
         # crop the image to the region of interest
-        frameCrop = crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px)
+        frameCrop = crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxWidth, calibBoxHeight, cm2px)
 
         # put text on videos to show the basic information
         frameOut = add_info(frameCrop, frameID, frameStart, orgVidFrameRate, newVidFrameRate)

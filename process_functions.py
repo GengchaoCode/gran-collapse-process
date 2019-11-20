@@ -67,7 +67,7 @@ def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight
     pts_src = np.array(sort_corners(cornerCoords), dtype=np.float32)
 
     # define the size of the transformed frame
-    if cropVidHeight < calibBoxHeight:                  # if the cropped video is within the calibration box
+    if cropVidHeight<calibBoxHeight and cropVidWidth<calibBoxWidth:                  # if the cropped video is within the calibration box
         calibWidth = int(cm2px*(calibBoxWidth+2))       # width of the calibrated frame
         calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
     else:                                               # if the cropped video is outside the calibration box
@@ -88,14 +88,14 @@ def perspective_transform(frameGray, cornerCoords, calibBoxWidth, calibBoxHeight
     return frameCalib
 
 
-def crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxHeight, cm2px):
+def crop_frame(frameCalib, cropVidWidth, cropVidHeight, calibBoxWidth, calibBoxHeight, cm2px):
     """Crop the frame to the region of interest"""
 
     # determine the bound of the cropped image
     col_left = int(cm2px)
     col_right = col_left+int(cm2px*cropVidWidth)
 
-    if cropVidHeight < calibBoxHeight:
+    if cropVidHeight<calibBoxHeight and cropVidWidth<calibBoxWidth:
         calibHeight = int(cm2px*(calibBoxHeight+2))     # height of the calibrated frame
     else:
         calibHeight = int(cm2px*(cropVidHeight+2))
